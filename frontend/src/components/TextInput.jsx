@@ -10,16 +10,16 @@ const Container = styled.div`
 
 const Label = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => theme.text_seconday};
+  color: ${({ theme }) => theme.text_secondary};
   padding: 0px 4px;
   text-transform: uppercase;
 `;
 
-const outLinedInput = styled.div`
+const OutLinedInput = styled.div`
   border-radius: 8px;
-  border: 0.5px solid ${({ theme }) => theme.text_seconday};
+  border: 0.5px solid ${({ theme }) => theme.text_secondary};
   background-color: transparent;
-  color: ${({ theme }) => theme.text_seconday};
+  color: ${({ theme }) => theme.text_secondary};
   outline: none;
   padding: 14px;
   display: flex;
@@ -36,9 +36,13 @@ const Input = styled.div`
   outline: none;
   border: none;
   background-color: transparent;
-  color: ${({ theme }) => theme.text_seconday};
+  color: ${({ theme }) => theme.text_secondary};
   &:focus {
     outline: none;
+  }
+    &::placeholder {
+    color: ${({ theme }) => theme.text_secondary};
+    opacity: 0.6;
   }
 `;
 
@@ -56,7 +60,7 @@ const TextInput = ({
     return(
         <Container>
             <Label>{label}</Label>
-            <outLinedInput>
+            <OutLinedInput>
                 <Input 
                 as={textArea? "textarea" : "input"}
                 name={name}
@@ -65,7 +69,7 @@ const TextInput = ({
                 placeholder={placeholder}
                 value={value}
                 onChange={(e)=>handleChange(e)}/>
-            </outLinedInput>
+            </OutLinedInput>
         </Container>
     )
 }

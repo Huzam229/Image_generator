@@ -49,8 +49,7 @@ const Wrapper = styled.div`
 const CardWrapper = styled.div`
   display: grid;
   gap: 20px;
-
-@media (max-width: 1200px) {
+@media (min-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
   }
 @media (min-width:640px) and (max-width: 1199px) {
@@ -62,6 +61,11 @@ const CardWrapper = styled.div`
 `;
 
 const Home = () => {
+  const item = {
+    photo: "https://images.unsplash.com/photo-1526779259212-939e64788e3c?q=80&w=1748&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    author: "john",
+    prompt: "A boy on the rock"
+  }
   return (
     <Container>
       <HeadLine>Explore popular post's in the Community.</HeadLine>
@@ -69,7 +73,17 @@ const Home = () => {
       <SearchBar />
       <Wrapper>
         <CardWrapper>
-         <ImageCard />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+         <ImageCard item={item} />
+
         </CardWrapper>
       </Wrapper>
     </Container>
