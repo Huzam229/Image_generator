@@ -2,6 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import SearchBar from "../components/SearchBar";
 import ImageCard from "../components/ImageCard";
+import { useState } from "react";
+import { CircularProgress } from "@mui/material";
+import { GetPost } from "../api";
+import { useEffect } from "react";
 
 const Container = styled.div`
   height: 100%;
@@ -49,42 +53,81 @@ const Wrapper = styled.div`
 const CardWrapper = styled.div`
   display: grid;
   gap: 20px;
-@media (min-width: 1200px) {
+  @media (min-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
   }
-@media (min-width:640px) and (max-width: 1199px) {
+  @media (min-width: 640px) and (max-width: 1199px) {
     grid-template-columns: repeat(3, 1fr);
   }
-    @media (max-width: 639px) {
+  @media (max-width: 639px) {
     grid-template-columns: repeat(2, 1fr);
   }
 `;
 
 const Home = () => {
-  const item = {
-    photo: "https://images.unsplash.com/photo-1526779259212-939e64788e3c?q=80&w=1748&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    author: "john",
-    prompt: "A boy on the rock"
-  }
+  const [post, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [filterPosts, setFilterPosts] = useState([]);
+
+  const getPost = async () => {
+    setLoading(true);
+    await GetPost()
+      .then((res) => {
+        setLoading(false);
+        setPosts(res?.data?.data);
+        setFilterPosts(res?.data?.data);
+      })
+      .catch((error) => {
+        setError(error?.response?.data?.message);
+        setLoading(false);
+      });
+  };
+  useEffect(() => {
+    getPost();
+  }, []);
+
+  useEffect(() => {
+    if (!search) {
+      setFilterPosts(post);
+    }
+      const SearchfilteredPosts = post.filter((post) => {
+      const promptMatch = post?.prompt?.toLowerCase().includes(search);
+      const authorMatch = post?.name?.toLowerCase().includes(search);
+      return promptMatch || authorMatch;
+    });
+
+    if (search) {
+      setFilterPosts(SearchfilteredPosts);
+    }
+  }, [post, search]);
   return (
     <Container>
       <HeadLine>Explore popular post's in the Community.</HeadLine>
       <Span>⦿ Generate With AI ⦿</Span>
-      <SearchBar />
+      <SearchBar search={search} setSearch={setSearch} />
       <Wrapper>
-        <CardWrapper>
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
-         <ImageCard item={item} />
+        {error && <div style={{ color: "red" }}>{error}</div>}
 
-        </CardWrapper>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <CardWrapper>
+            {filterPosts.length === 0 ? (
+              <>No Post Found</>
+            ) : (
+              <>
+                {filterPosts
+                  .slice()
+                  .reverse()
+                  .map((item, index) => (
+                    <ImageCard key={index} item={item} />
+                  ))}
+              </>
+            )}
+          </CardWrapper>
+        )}
       </Wrapper>
     </Container>
   );

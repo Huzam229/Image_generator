@@ -1,8 +1,10 @@
-import React from "react";
 import styled from "styled-components";
 import TextInput from "./TextInput";
 import ButtonComponent from "./button";
 import { AutoAwesome, CreateRounded } from "@mui/icons-material";
+import { GenerateImage,CreatePost } from "../api";
+import { useState } from "react";
+import {useNavigate} from 'react-router-dom'
 
 const Form = styled.div`
   flex: 1;
@@ -49,12 +51,36 @@ const GenerateImageForm = ({
   setGenerateImageLoading,
   generateImageLoading,
 }) => {
-const generateaImageFun = () =>{
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const generateaImageFun = async () => {
     setGenerateImageLoading(true);
-}
-const createPostFun = () =>{
+    await GenerateImage({ prompt: post.prompt })
+      .then((res) => {
+        setPost({
+          ...post,
+          photo: `data:image/jpeg;base64,${res?.data?.photo}`,
+        });
+        setGenerateImageLoading(false);
+      })
+      .catch((error) => {
+        setError(error?.response?.data?.message);
+        setGenerateImageLoading(false);
+      });
+  };
+  const createPostFun = async () => {
     setCreatePostLoading(true);
-}
+    await CreatePost(post)
+      .then((res) => {
+        setCreatePostLoading(false);
+        navigate("/")
+        
+      })
+      .catch((error) => {
+        setError(error?.response?.data?.message);
+        setCreatePostLoading(false);
+      });
+  };
 
   return (
     <Form>
@@ -81,6 +107,7 @@ const createPostFun = () =>{
           value={post.prompt}
           handleChange={(e) => setPost({ ...post, prompt: e.target.value })}
         />
+        {error && <div style={{ color: "red" }}>{error}</div>}
         ** You can post the AI Generated Image to the Community **
       </Body>
       <Action>
@@ -90,7 +117,7 @@ const createPostFun = () =>{
           leftIcon={<AutoAwesome />}
           isLoading={generateImageLoading}
           isDisabled={post.prompt === ""}
-          onClick={()=>generateaImageFun()}
+          onClick={() => generateaImageFun()}
         />
         <ButtonComponent
           text="Post Image"
@@ -101,8 +128,7 @@ const createPostFun = () =>{
           isDisabled={
             post.name === "" || post.prompt === "" || post.photo === ""
           }
-        onClick={()=>createPostFun()}
-
+          onClick={() => createPostFun()}
         />
       </Action>
     </Form>
