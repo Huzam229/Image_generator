@@ -22,7 +22,8 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // CORS
 app.use(cors({
-  origin: "https://imago-omega.vercel.app",
+  // origin: "https://imago-omega.vercel.app",
+  origin: "http://localhost:3000",
   credentials: true
 }));
 

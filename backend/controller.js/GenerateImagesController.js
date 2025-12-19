@@ -32,7 +32,7 @@
 //   }
 // };
 
-
+import fetch from "node-fetch";
 
 export const generateImages = async (req, res) => {
   try {
@@ -63,14 +63,27 @@ export const generateImages = async (req, res) => {
     const encodedPrompt = encodeURIComponent(enhancedPrompt);
     const encodedNegative = encodeURIComponent(negativePrompt);
 
-    // Reduced size to prevent timeout
+    // Add proper headers to avoid 403
     const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&model=flux-realism&negative=${encodedNegative}&seed=${Date.now()}`;
 
-    const response = await fetch(imageUrl);
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://pollinations.ai/',
+        'Origin': 'https://pollinations.ai'
+      },
+      method: 'GET'
+    });
 
     console.log("Response status:", response.status);
+    
     if (!response.ok) {
-      throw new Error(`Pollinations failed: ${response.status}`);
+      // Log response for debugging
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      throw new Error(`Pollinations failed: ${response.status} - ${errorText}`);
     }
 
     const buffer = await response.arrayBuffer();
@@ -92,5 +105,3 @@ export const generateImages = async (req, res) => {
     });
   }
 };
-
-
